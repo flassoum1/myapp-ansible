@@ -1,1 +1,1 @@
-<?php phpinfo(); ?> 
+This is PHP info page<?php phpinfo(); ?> 
