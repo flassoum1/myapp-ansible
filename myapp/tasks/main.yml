@@ -1,0 +1,24 @@
+---
+- name: Install my App 
+  debug: 
+- name: Download wordpress                   
+  ansible.builtin.get_url:                   # Means that it is part of the collection of modules "builtin" with ansible and shipped with it
+    url: https://wordpress.org/wordpress-6.2.2.tar.gz
+    dest: /tmp
+
+- name: Extract wordpress                    # Extracting 
+  ansible.builtin.unarchive:                 # Unarchive in here means: unpacks an archive after copying it from the local machine
+    src: /tmp/wordpress-6.2.2.tar.gz         # Path to the destination directory 
+    dest: /var/www/html                      # Path to the destination directory                  
+    remote_src: yes                          # To unpack an archive which already exists on the target
+
+- name: Copy file with owner and permissions # The copy module copies a file from the local or remote machine to a location on the remote machine.
+  ansible.builtin.copy:
+    src: /var/www/html/wordpress/             
+    dest: /var/www/html/
+    remote_src: yes
+
+- name: Remove file (delete file)
+  ansible.builtin.file:
+    path: /var/www/html/index.html
+    state: absent  

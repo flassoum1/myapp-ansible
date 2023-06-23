@@ -1,0 +1,33 @@
+---
+- name: my hello world
+  become: yes # this makes the user to become root or sudo
+  gather_facts: yes
+  hosts: all
+
+# Roles are basically grouping tasks. The role is the primary mechanism for breaking a playbook into multiple files.
+# This simplifies writing complex playbooks, and it makes them easier to reuse.
+# Roles are not playbooks. Roles are small functionality which can be independently used but have to be used within playbooks.
+#  
+
+  roles:
+    - role: 'geerlingguy.apache'                # Specifying apache role
+    - role: 'geerlingguy.php'                   # Specifying php role
+    - role: 'geerlingguy.php-mysql'             # Specifying php-mysql role
+    - role: 'geerlingguy.mysql'                 # Specifying mysql role
+    - role: 'myapp'                             # Specifying my app
+
+# what if you don't want to keep calling your variables in command line?
+# You can create another yml file and list all your variables in there and call the file name in your actual webpage
+  vars_files: 
+    - flassoum.yml
+
+  tasks: 
+    - name: Copy wp-config.php # The copy module copies a file from the local or remote machine to a location on the remote machine.
+      ansible.builtin.copy:
+        src: wp-config.php            
+        dest: /var/www/html/    
+
+    - name: Copy info.php 
+      ansible.builtin.copy:
+        src: info.php            
+        dest: /var/www/html/
