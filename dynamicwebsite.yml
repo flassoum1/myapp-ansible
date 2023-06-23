@@ -1,0 +1,98 @@
+---
+- name: my hello world
+  become: yes # this makes the user to become root or sudo
+  gather_facts: yes
+  hosts: all
+
+# what if you don't want to keep calling your variables in command line?
+# You can create another yml file and list all your variables in there and call the file name in your actual webpage
+  vars_files: 
+    - flassoum.yml 
+
+  #vars: # Defining a new variables
+    #mywebsite: My Ansible Webpage # Assigning a values to my variables
+
+
+  tasks: 
+    - name: Install apache httpd  (state=present is optional)
+      ansible.builtin.apt:
+      #  name: apache2                          # name of the package to be installed
+        name: "{{item}}"
+        state: present                          # can put absent if you want to remove the package
+        update_cache: yes
+      become: yes                               # this makes the user to become root or sudo
+      loop:                                     #
+        - apache2
+        - libapache2-mod-php                    # the Apache can send request to the PHP, which builts website, sends rendered HTML (or whatever else) to the Apache, and it is later responsed to the user
+        - mysql-client
+        - mysql-server
+        - php-mysql
+        - python3-mysqldb
+        - zip
+
+
+      notify:
+        - restart apache
+          
+
+    - name: Start service webserver, if not started
+      ansible.builtin.service:
+        name: apache2
+        state: started
+  #  - name: template
+  #    ansible.builtin.template:
+  #      src: webpage.j2 # this is referencing the custom webpage
+  #      dest: /var/www/html/index.html # this is the part where apache2 accepts its files being copied or written to it  
+      #vars: # this specify the variables. Note: the variables need to match the template but the the content of the template can be anyhting.
+        #myname: Flassoum Togola
+
+    - name: Download wordpress                   
+      ansible.builtin.get_url:                   # Means that it is part of the collection of modules "builtin" with ansible and shipped with it
+        url: https://wordpress.org/wordpress-6.2.2.tar.gz
+        dest: /tmp
+
+    - name: Extract wordpress                    # Extracting 
+      ansible.builtin.unarchive:                 # Unarchive in here means: unpacks an archive after copying it from the local machine
+        src: /tmp/wordpress-6.2.2.tar.gz         # Path to the destination directory 
+        dest: /var/www/html                      # Path to the destination directory                  
+        remote_src: yes                          # To unpack an archive which already exists on the target
+
+    - name: Copy file with owner and permissions # The copy module copies a file from the local or remote machine to a location on the remote machine.
+      ansible.builtin.copy:
+        src: /var/www/html/wordpress/             
+        dest: /var/www/html/
+        remote_src: yes
+
+
+    - name: set root password
+      community.mysql.mysql_user:
+        check_implicit_admin: true
+        login_user: root
+        login_password: test1234
+        name: root
+        password: test1234
+
+    - name: Remove file (delete file)
+      ansible.builtin.file:
+        path: /var/www/html/index.html
+        state: absent
+
+
+    - name: Create a new database with name 'bobdata'
+      community.mysql.mysql_db:
+        name: bobdata
+        login_user: root
+        login_password: test1234 
+
+
+    - name: Copy wp-config.php # The copy module copies a file from the local or remote machine to a location on the remote machine.
+      ansible.builtin.copy:
+        src: wp-config.php            
+        dest: /var/www/html/
+
+
+  handlers: 
+    - name: restart apache
+      ansible.builtin.service:
+        name: apache2
+        state: restarted                     
