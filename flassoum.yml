@@ -37,3 +37,6 @@ mysql_packages:
 mysql_root_password: test12345
 mysql_databases:
   - name: example_db
+
+php_packages:
+  - libapache2-mod-php
