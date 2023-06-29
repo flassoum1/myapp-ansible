@@ -9,11 +9,12 @@
 # Roles are not playbooks. Roles are small functionality which can be independently used but have to be used within playbooks.
 #  
 
+#
   roles:
     - role: 'geerlingguy.apache'                # Specifying apache role
     - role: 'geerlingguy.php'                   # Specifying php role
     - role: 'geerlingguy.php-mysql'             # Specifying php-mysql role
-    - role: 'geerlingguy.mysql'                 # Specifying mysql role
+   # - role: 'geerlingguy.mysql'                 # Specifying mysql role
     - role: 'myapp'                             # Specifying my app
 
 # what if you don't want to keep calling your variables in command line?
