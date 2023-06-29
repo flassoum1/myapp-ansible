@@ -23,8 +23,8 @@
     - flassoum.yml
 
   tasks: 
-    - name: Copy wp-config.php # The copy module copies a file from the local or remote machine to a location on the remote machine.
-      ansible.builtin.copy:
+    - name: template wp-config.php # The copy module copies a file from the local or remote machine to a location on the remote machine.
+      ansible.builtin.template:
         src: wp-config.php            
         dest: /var/www/html/    
 
